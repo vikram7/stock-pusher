@@ -28,20 +28,34 @@ require_relative 'tradier_api'
 #   puts "======="
 # end
 
-base_uri = 'https://stock-indicator.firebaseio.com/'
-firebase = Firebase::Client.new(base_uri)
+# base_uri = 'https://dazzling-fire-7751.firebaseio.com/'
+# firebase = Firebase::Client.new(base_uri)
 
-price = 510.455
-while true
-  hash = Hash.new
-  hash =
-  {
-    :symbol => "GOOGL",
-    :price => price,
-    :timestamp => Time.now.to_i
-  }
-  a = rand(-1..1)
-  price *= (1 + a*(0.0005))
-  puts price
-  response = firebase.push("stocks", hash)
-end
+# price = 510.455
+# while true
+#   hash = Hash.new
+#   hash =
+#   {
+#     :symbol => "GOOGL",
+#     :price => price,
+#     :timestamp => Time.now.to_i
+#   }
+#   a = rand(-1..1)
+#   price *= (1 + a*(0.0005))
+#   puts price
+#   response = firebase.push("stocks", hash)
+# end
+
+uri = URI.parse("https://sandbox.tradier.com/v1/markets/history?symbol=AAPL&start=2014-01-01")
+http = Net::HTTP.new(uri.host, uri.port)
+http.read_timeout = 30
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+request = Net::HTTP::Get.new(uri.request_uri)
+request["Accept"] = "application/json"
+request["Authorization"] = "Bearer " + ENV["TOKEN"]
+underlying_data = http.request(request)
+parsed_underlying_data = JSON.parse(underlying_data.body)
+
+
+# write new methods to recreate hash you want
